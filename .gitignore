@@ -20,7 +20,7 @@ project/local_settings.py
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
-.idea/misc.xml,
+.idea/misc.xml
 .idea/jsLibraryMappings.xml
 
 # AWS User-specific
@@ -142,3 +142,6 @@ GitHub.sublime-settings
 !.vscode/launch.json 
 !.vscode/extensions.json 
 .history
+
+.DS_Store
+Thumbs.db
