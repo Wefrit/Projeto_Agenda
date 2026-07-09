@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from contact.forms import ContactForm
 from django.urls import reverse
-from contact.models import Contact
 from django.contrib.auth.decorators import login_required
+from contact.forms import ContactForm
+from contact.views.contact_views import get_contacts_queryset  
 
 @login_required(login_url='contact:login')
 def create(request):
@@ -13,14 +13,15 @@ def create(request):
 
         context = {
             'form': form,
-            'form_action':form_action,
+            'form_action': form_action,
         }
 
         if form.is_valid():
-           contact = form.save(commit=False)
-           contact.owner = request.user
-           contact.save()
-           return redirect('contact:index', contact_id=contact.pk)
+            contact = form.save(commit=False)
+            contact.owner = request.user
+            contact.save()
+
+            return redirect('contact:contact', contact_id=contact.pk)
 
         return render(
             request,
@@ -29,8 +30,8 @@ def create(request):
         )
 
     context = {
-            'form': ContactForm(),
-            'form_action':form_action,
+        'form': ContactForm(),
+        'form_action': form_action,
     }
 
     return render(
@@ -43,20 +44,27 @@ def create(request):
 @login_required(login_url='contact:login')
 def update(request, contact_id):
     contact = get_object_or_404(
-        Contact, pk=contact_id, show=True, owner=request.user,
-        )
+        get_contacts_queryset(request),
+        pk=contact_id,
+    )
+
     form_action = reverse('contact:update', args=(contact_id,))
 
     if request.method == 'POST':
-        form = ContactForm(request.POST, request.FILES, instance=contact)
+        form = ContactForm(
+            request.POST,
+            request.FILES,
+            instance=contact,
+        )
+
         context = {
             'form': form,
-            'form_action':form_action,
+            'form_action': form_action,
         }
 
         if form.is_valid():
-           contact =  form.save()
-           return redirect('contact:contact', contact_id=contact.id )
+            contact = form.save()
+            return redirect('contact:contact', contact_id=contact.id)
 
         return render(
             request,
@@ -65,8 +73,8 @@ def update(request, contact_id):
         )
 
     context = {
-            'form': ContactForm(instance=contact),
-            'form_action':form_action,
+        'form': ContactForm(instance=contact),
+        'form_action': form_action,
     }
 
     return render(
@@ -79,7 +87,8 @@ def update(request, contact_id):
 @login_required(login_url='contact:login')
 def delete(request, contact_id):
     contact = get_object_or_404(
-        Contact, pk=contact_id, show=True, owner=request.user,
+        get_contacts_queryset(request),
+        pk=contact_id,
     )
 
     confirmation = request.POST.get('confirmation', 'no')
@@ -89,10 +98,10 @@ def delete(request, contact_id):
         return redirect('contact:index')
 
     return render(
-        request, 
+        request,
         'contact/contact.html',
         {
-            'contact':contact,
-            'confirmation':confirmation,
+            'contact': contact,
+            'confirmation': confirmation,
         }
     )
