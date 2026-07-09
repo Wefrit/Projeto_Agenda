@@ -105,7 +105,7 @@ http://127.0.0.1:8000/
 
 ### Página inicial
 
-![Página inicial](screenshots/index.png)
+![Página inicial](screenshots/Index.png)
 
 ### Login
 
